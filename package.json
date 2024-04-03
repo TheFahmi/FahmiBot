@@ -1,0 +1,30 @@
+{
+  "name": "new",
+  "version": "1.0.0",
+  "main": "22 - Copy.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "axios": "^1.6.7",
+    "chalk": "^4.1.2",
+    "chrome-paths": "^1.0.1",
+    "dayjs": "^1.11.10",
+    "figlet": "^1.7.0",
+    "fs": "^0.0.1-security",
+    "node-machine-id": "^1.1.12",
+    "path": "^0.12.7",
+    "progress": "^2.0.3",
+    "puppeteer": "^22.2.0",
+    "puppeteer-core": "^22.2.0",
+    "puppeteer-extra": "^3.3.6",
+    "puppeteer-extra-plugin-devtools": "^2.4.6",
+    "puppeteer-extra-plugin-stealth": "^2.11.2",
+    "readline-sync": "^1.4.10",
+    "ws": "^8.16.0"
+  }
+}
