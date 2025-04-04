@@ -73,7 +73,7 @@ const UpgradeItem: React.FC<UpgradeItemProps> = ({
     if (upgrade.level > 0) {
       return (
         <View style={styles.levelBadge}>
-          <Text style={styles.levelText}>{upgrade.level}</Text>
+          <Text style={styles.levelText}>Lvl {upgrade.level}</Text>
         </View>
       );
     }
@@ -116,40 +116,19 @@ const UpgradeItem: React.FC<UpgradeItemProps> = ({
           </View>
           <Text style={styles.description}>{upgrade.description}</Text>
           
-          {upgrade.level > 0 ? (
-            <View style={styles.statsContainer}>
-              <View style={styles.multiplierBadge}>
-                <Text style={styles.bonusText}>
-                  +{upgrade.moneyPerClickBonus} per klik
-                </Text>
-              </View>
-              <View style={styles.priceBadge}>
-                <Text style={styles.nextPriceText}>{formatMoney(currentPrice)}</Text>
-              </View>
+          <View style={styles.statsRow}>
+            <View style={styles.bonusContainer}>
+              <MaterialCommunityIcons name="cursor-default-click" size={16} color="#FFFFFF" />
+              <Text style={styles.bonusText}>
+                +{upgrade.moneyPerClickBonus} per klik
+              </Text>
             </View>
-          ) : (
-            <View style={styles.priceContainer}>
-              <MaterialCommunityIcons name={cashIcon} size={16} color="#FFFFFF" />
-              <Text style={styles.price}>{formatMoney(currentPrice)}</Text>
-            </View>
-          )}
+          </View>
         </View>
         
-        {upgrade.level > 0 ? (
-          <View style={styles.levelUpBadge}>
-            <Text style={styles.levelUpText}>Lv.{upgrade.level}</Text>
-          </View>
-        ) : (
-          disabled ? (
-            <View style={styles.lockBadge}>
-              <MaterialCommunityIcons name="lock" size={20} color="#90A4AE" />
-            </View>
-          ) : (
-            <View style={styles.buyBadge}>
-              <MaterialCommunityIcons name="plus-circle" size={24} color="#FFFFFF" />
-            </View>
-          )
-        )}
+        <View style={styles.priceBadge}>
+          <Text style={styles.priceText}>{formatMoney(currentPrice)}</Text>
+        </View>
       </LinearGradient>
     </TouchableOpacity>
   );
@@ -228,7 +207,12 @@ const styles = StyleSheet.create({
     color: 'rgba(255, 255, 255, 0.9)',
     marginBottom: 8,
   },
-  priceContainer: {
+  statsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  bonusContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: 'rgba(0, 0, 0, 0.15)',
@@ -237,68 +221,25 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     alignSelf: 'flex-start',
   },
-  price: {
-    fontSize: 14,
-    fontWeight: 'bold',
+  bonusText: {
     color: '#FFFFFF',
+    fontWeight: 'bold',
+    fontSize: 12,
     marginLeft: 4,
   },
-  statsContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  multiplierBadge: {
-    backgroundColor: 'rgba(0, 0, 0, 0.15)',
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 12,
-  },
   priceBadge: {
-    backgroundColor: 'rgba(255, 152, 0, 0.2)',
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 12,
-  },
-  bonusText: {
-    fontSize: 12,
-    fontWeight: 'bold',
-    color: '#FFFFFF',
-  },
-  nextPriceText: {
-    fontSize: 12,
-    fontWeight: 'bold',
-    color: '#FFFFFF',
-  },
-  levelUpBadge: {
-    backgroundColor: 'rgba(255, 255, 255, 0.3)',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
+    backgroundColor: 'rgba(0, 0, 0, 0.15)',
+    paddingHorizontal: 10,
+    paddingVertical: 6,
     borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
-    alignSelf: 'center',
   },
-  levelUpText: {
+  priceText: {
     color: '#FFFFFF',
     fontWeight: 'bold',
-    fontSize: 12,
-  },
-  buyBadge: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    alignSelf: 'center',
-  },
-  lockBadge: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    alignSelf: 'center',
-  },
-  ownedBadge: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    alignSelf: 'center',
-  },
+    fontSize: 14,
+  }
 });
 
 export default UpgradeItem; 
