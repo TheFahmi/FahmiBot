@@ -89,7 +89,11 @@ const BusinessItem: React.FC<BusinessItemProps> = ({
   
   // Handle klik pada bisnis item
   const handlePress = () => {
-    if (owned) {
+    // Panggil fungsi onPress dari props dulu
+    onPress();
+    
+    // Hanya tampilkan text jika bisnis dimiliki dan level > 0
+    if (owned && business.level > 0) {
       setShowIncomeText(true);
       
       // Tampilkan teks income selama 500ms
@@ -97,9 +101,6 @@ const BusinessItem: React.FC<BusinessItemProps> = ({
         setShowIncomeText(false);
       }, 500);
     }
-    
-    // Panggil fungsi onPress dari props
-    onPress();
   };
   
   // Hitung income yang akan didapat jika dibeli atau ditingkatkan
