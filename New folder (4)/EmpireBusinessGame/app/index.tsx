@@ -8,7 +8,7 @@ import ClickButton from '../components/ClickButton';
 import UpgradeItem from '../components/UpgradeItem';
 import BusinessItem from '../components/BusinessItem';
 import MoneyCard from '../components/MoneyCard';
-import { showInfoNotification } from '../utils/notifications';
+import { showInfoNotification, showWarningNotification } from '../utils/notifications';
 
 const screenWidth = Dimensions.get('window').width;
 const screenHeight = Dimensions.get('window').height;
@@ -84,6 +84,71 @@ export default function HomeScreen() {
   const buttonScale = useRef(new Animated.Value(1)).current;
   const toastOpacity = useRef(new Animated.Value(0)).current;
   
+  // Anti-cheat: Click tracking
+  const clickTimes = useRef<number[]>([]).current;
+  const [isClickBlocked, setIsClickBlocked] = useState(false);
+  const [blockEndTime, setBlockEndTime] = useState(0);
+  const [warningShown, setWarningShown] = useState(false);
+  
+  // Anti-cheat: Fungsi untuk mengecek pola klik yang tidak wajar
+  const checkClickPattern = () => {
+    const now = Date.now();
+    
+    // Simpan waktu klik
+    clickTimes.push(now);
+    
+    // Hanya periksa jika sudah ada cukup sampel klik
+    if (clickTimes.length >= 10) {
+      // Hapus entri lebih dari 20 detik yang lalu
+      while (clickTimes.length > 0 && now - clickTimes[0] > 20000) {
+        clickTimes.shift();
+      }
+      
+      // Hitung klik per detik rata-rata dalam 3 detik terakhir
+      const recentClicks = clickTimes.filter(time => now - time <= 3000);
+      const clicksPerSecond = recentClicks.length / 3;
+      
+      // Cek interval antar klik untuk mendeteksi pola yang konsisten (ciri autoclicker)
+      if (recentClicks.length >= 10) {
+        const intervals = [];
+        for (let i = 1; i < recentClicks.length; i++) {
+          intervals.push(recentClicks[i] - recentClicks[i-1]);
+        }
+        
+        // Hitungan standard deviasi interval
+        const avgInterval = intervals.reduce((sum, val) => sum + val, 0) / intervals.length;
+        const variance = intervals.reduce((sum, val) => sum + Math.pow(val - avgInterval, 2), 0) / intervals.length;
+        const stdDev = Math.sqrt(variance);
+        
+        // Auto clicker biasanya memiliki interval yang sangat konsisten (stdDev rendah)
+        // dan klik per detik tinggi
+        if ((stdDev < 50 && clicksPerSecond > 5) || clicksPerSecond > 10) {
+          if (!isClickBlocked) {
+            setIsClickBlocked(true);
+            const blockDuration = 30000; // 30 detik
+            setBlockEndTime(now + blockDuration);
+            
+            // Tampilkan peringatan
+            showWarningNotification(
+              'Terdeteksi pola klik tidak wajar! Klik dinonaktifkan sementara.',
+              'alert-circle',
+              5000
+            );
+            
+            // Timer untuk menghapus blokir
+            setTimeout(() => {
+              setIsClickBlocked(false);
+              clickTimes.length = 0; // Hapus semua entri
+            }, blockDuration);
+          }
+          return true;
+        }
+      }
+    }
+    
+    return false;
+  };
+  
   // Efek animasi ketika tombol diklik
   const animateButton = () => {
     Animated.sequence([
@@ -113,15 +178,37 @@ export default function HomeScreen() {
   
   // Fungsi untuk menangani klik
   const handleClick = (event?: GestureResponderEvent) => {
-    animateButton();
-    addMoney(moneyPerClick, 'click');
+    // Cek jika klik sedang diblokir
+    if (isClickBlocked) {
+      // Tampilkan pesan blokir jika belum ditampilkan
+      if (!warningShown) {
+        setWarningShown(true);
+        const remainingTime = Math.ceil((blockEndTime - Date.now()) / 1000);
+        
+        showWarningNotification(
+          `Klik diblokir! Tunggu ${remainingTime} detik lagi.`,
+          'lock-clock',
+          3000
+        );
+        
+        setTimeout(() => setWarningShown(false), 3000);
+      }
+      return;
+    }
     
-    // Dapatkan posisi klik untuk animasi
-    if (event && event.nativeEvent) {
-      setClickPosition({
-        x: event.nativeEvent.locationX,
-        y: event.nativeEvent.locationY,
-      });
+    // Deteksi pola klik mencurigakan
+    if (!checkClickPattern()) {
+      // Hanya lanjutkan jika tidak ada pola yang mencurigakan
+      animateButton();
+      addMoney(moneyPerClick, 'click');
+      
+      // Dapatkan posisi klik untuk animasi
+      if (event && event.nativeEvent) {
+        setClickPosition({
+          x: event.nativeEvent.locationX,
+          y: event.nativeEvent.locationY,
+        });
+      }
     }
   };
   
