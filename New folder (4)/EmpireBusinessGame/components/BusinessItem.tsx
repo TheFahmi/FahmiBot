@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import formatMoney from '../utils/formatMoney';
@@ -66,10 +66,6 @@ const BusinessItem: React.FC<BusinessItemProps> = ({
 }) => {
   // Tambahkan state untuk menampilkan tulisan klik
   const [showIncomeText, setShowIncomeText] = useState(false);
-  // State untuk menyimpan animasi klik yang aktif
-  const [clickAnimations, setClickAnimations] = useState<Array<{id: number, amount: number, top: number, left: number}>>([]);
-  // Counter untuk ID unik animasi
-  const animationIdCounter = useRef(0);
   
   // Icon default dari Material Community Icons
   const moneyIcon: IconName = "cash";
@@ -111,30 +107,6 @@ const BusinessItem: React.FC<BusinessItemProps> = ({
       setTimeout(() => {
         setShowIncomeText(false);
       }, 500);
-    }
-    
-    // Tambahkan animasi +(angka) perklik jika bisnis sudah dimiliki
-    if (owned) {
-      const incomeAmount = calculateBusinessIncome(business.baseIncomePerSecond, business.level);
-      
-      // Buat posisi acak sekitar ikon
-      const randomTop = -15 + Math.floor(Math.random() * 30);
-      const randomLeft = -15 + Math.floor(Math.random() * 30);
-      
-      // Tambahkan animasi baru
-      const newAnimation = {
-        id: animationIdCounter.current++,
-        amount: incomeAmount,
-        top: randomTop,
-        left: randomLeft
-      };
-      
-      setClickAnimations(prev => [...prev, newAnimation]);
-      
-      // Hapus animasi setelah 800ms
-      setTimeout(() => {
-        setClickAnimations(prev => prev.filter(anim => anim.id !== newAnimation.id));
-      }, 800);
     }
   };
   
@@ -178,19 +150,6 @@ const BusinessItem: React.FC<BusinessItemProps> = ({
                 <Text style={styles.incomePopupText}>+{formatMoney(calculateBusinessIncome(business.baseIncomePerSecond, business.level))}</Text>
               </View>
             )}
-            
-            {/* Tampilkan semua animasi klik yang aktif */}
-            {clickAnimations.map((anim) => (
-              <View 
-                key={anim.id} 
-                style={[
-                  styles.clickAnimationContainer, 
-                  { top: anim.top, left: anim.left }
-                ]}
-              >
-                <Text style={styles.clickAnimationText}>+{formatMoney(anim.amount)}</Text>
-              </View>
-            ))}
           </View>
         </View>
         
