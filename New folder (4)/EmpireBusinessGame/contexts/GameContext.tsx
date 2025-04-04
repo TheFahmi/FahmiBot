@@ -588,6 +588,7 @@ interface GameContextValue {
   resetGame: () => void;
   buyUpgrade: (upgradeId: string) => void;
   buyBusiness: (businessId: string) => void;
+  upgradeBusiness: (businessId: string) => void;
   collectBusinessIncome: (businessId: string) => void;
   saveGame: () => Promise<boolean>;
 }
@@ -700,6 +701,10 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     dispatch({ type: 'BUY_BUSINESS', payload: businessId });
   };
   
+  const upgradeBusiness = (businessId: string) => {
+    dispatch({ type: 'UPGRADE_BUSINESS', payload: businessId });
+  };
+  
   const collectBusinessIncome = (businessId: string) => {
     dispatch({ type: 'COLLECT_BUSINESS_INCOME', payload: businessId });
   };
@@ -712,6 +717,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         resetGame,
         buyUpgrade,
         buyBusiness,
+        upgradeBusiness,
         collectBusinessIncome,
         saveGame: saveGameData, // Tambahkan fungsi untuk menyimpan game secara manual
       }}
@@ -733,6 +739,7 @@ export const useGameContext = () => {
       resetGame: () => {},
       buyUpgrade: () => {},
       buyBusiness: () => {},
+      upgradeBusiness: () => {},
       collectBusinessIncome: () => {},
       saveGame: async () => true,
     };

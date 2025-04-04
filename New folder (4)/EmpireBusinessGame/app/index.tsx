@@ -31,6 +31,7 @@ export default function HomeScreen() {
     addMoney,
     buyUpgrade,
     buyBusiness,
+    upgradeBusiness,
     collectBusinessIncome,
     saveGame,
   } = useGameContext();
@@ -124,16 +125,25 @@ export default function HomeScreen() {
     }
   };
   
+  // Fungsi untuk membeli business
+  const handleBuyBusiness = (businessId: string) => {
+    const business = businesses.find(b => b.id === businessId);
+    if (!business) return;
+    
+    if (business.owned) {
+      // Jika bisnis sudah dimiliki, lakukan upgrade
+      upgradeBusiness(businessId);
+    } else {
+      // Jika bisnis belum dimiliki, beli bisnis baru
+      buyBusiness(businessId);
+    }
+  };
+
   // Fungsi untuk membeli upgrade
   const handleBuyUpgrade = (upgradeId: string) => {
     buyUpgrade(upgradeId);
   };
-
-  // Fungsi untuk membeli business
-  const handleBuyBusiness = (businessId: string) => {
-    buyBusiness(businessId);
-  };
-
+  
   // Tampilkan toast passive income
   useEffect(() => {
     if (moneyPerSecond > 0) {
@@ -177,7 +187,9 @@ export default function HomeScreen() {
           key={business.id}
           business={business}
           onPress={() => handleBuyBusiness(business.id)}
-          disabled={money < (business.owned ? calculateBusinessPrice(business.basePrice, business.level) : business.basePrice)}
+          disabled={business.owned 
+            ? money < calculateBusinessPrice(business.basePrice, business.level) 
+            : money < business.basePrice}
           owned={business.owned}
         />
       ))}
