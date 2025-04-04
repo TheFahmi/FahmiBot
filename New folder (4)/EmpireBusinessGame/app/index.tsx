@@ -430,31 +430,59 @@ export default function HomeScreen() {
             )}
             
             {/* Tampilkan semua animasi klik yang aktif */}
-            {clickAnimations.map((anim) => (
-              <Animated.View
-                key={anim.id}
-                style={[
-                  styles.clickAnimationContainer,
-                  {
-                    position: 'absolute',
-                    left: anim.x,
-                    top: anim.y,
-                    opacity: new Animated.Value(1),
-                    transform: [
-                      {
-                        translateY: new Animated.Value(0).interpolate({
-                          inputRange: [0, 1],
-                          outputRange: [0, -30],
-                        })
-                      },
-                      { scale: new Animated.Value(1) }
-                    ]
-                  }
-                ]}
-              >
-                <Text style={styles.clickAnimationText}>+{formatMoney(anim.amount)}</Text>
-              </Animated.View>
-            ))}
+            {clickAnimations.map((anim) => {
+              // Buat nilai animasi untuk setiap instance
+              const animOpacity = new Animated.Value(1);
+              const animTranslateY = new Animated.Value(0);
+              const animScale = new Animated.Value(1);
+              
+              // Mulai animasi untuk instance ini
+              Animated.parallel([
+                Animated.timing(animOpacity, {
+                  toValue: 0,
+                  duration: 800,
+                  useNativeDriver: true,
+                }),
+                Animated.timing(animTranslateY, {
+                  toValue: -50,
+                  duration: 800,
+                  useNativeDriver: true,
+                }),
+                Animated.sequence([
+                  Animated.timing(animScale, {
+                    toValue: 1.2,
+                    duration: 150,
+                    useNativeDriver: true,
+                  }),
+                  Animated.timing(animScale, {
+                    toValue: 1,
+                    duration: 650,
+                    useNativeDriver: true,
+                  }),
+                ]),
+              ]).start();
+              
+              return (
+                <Animated.View
+                  key={anim.id}
+                  style={[
+                    styles.clickAnimationContainer,
+                    {
+                      position: 'absolute',
+                      left: anim.x,
+                      top: anim.y,
+                      opacity: animOpacity,
+                      transform: [
+                        { translateY: animTranslateY },
+                        { scale: animScale }
+                      ]
+                    }
+                  ]}
+                >
+                  <Text style={styles.clickAnimationText}>+{formatMoney(anim.amount)}</Text>
+                </Animated.View>
+              );
+            })}
           </TouchableOpacity>
         </View>
         
