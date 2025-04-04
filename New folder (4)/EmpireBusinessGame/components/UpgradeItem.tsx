@@ -16,6 +16,7 @@ export interface UpgradeInterface {
   level: number;
   moneyPerClickBonus: number;
   icon: string;
+  effect: number;
 }
 
 // Fungsi untuk menghitung harga upgrade
@@ -36,6 +37,9 @@ const UpgradeItem: React.FC<UpgradeItemProps> = ({
   disabled = false,
   owned = false,
 }) => {
+  const { name, description, basePrice, level, icon, effect } = upgrade;
+  const price = calculateUpgradePrice(basePrice, level);
+  
   // Icon default dari Material Community Icons
   const defaultIcon: IconName = "cursor-default-click";
   const cashIcon: IconName = "cash";
@@ -54,9 +58,6 @@ const UpgradeItem: React.FC<UpgradeItemProps> = ({
     }
   };
   
-  // Hitung harga upgrade saat ini
-  const currentPrice = calculateUpgradePrice(upgrade.basePrice, upgrade.level);
-  
   // Tentukan warna latar belakang berdasarkan status item
   const getGradientColors = (): [string, string] => {
     if (owned) {
@@ -69,10 +70,10 @@ const UpgradeItem: React.FC<UpgradeItemProps> = ({
   };
   
   const getLevelBadge = () => {
-    if (upgrade.level > 0) {
+    if (level > 0) {
       return (
         <View style={styles.levelBadge}>
-          <Text style={styles.levelText}>{upgrade.level}</Text>
+          <Text style={styles.levelText}>{level}</Text>
         </View>
       );
     }
@@ -81,131 +82,131 @@ const UpgradeItem: React.FC<UpgradeItemProps> = ({
   
   return (
     <TouchableOpacity
-      style={styles.container}
+      style={[
+        styles.container,
+        disabled && styles.disabledContainer,
+      ]}
       onPress={onPress}
       disabled={disabled}
-      activeOpacity={0.8}
+      activeOpacity={0.7}
     >
-      <LinearGradient
-        colors={getGradientColors()}
-        style={[
-          styles.gradientContainer,
-          upgrade.level > 0 && styles.owned,
-          disabled && styles.disabled
-        ]}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-      >
-        <View style={styles.iconContainer}>
-          <View style={styles.iconBackground}>
-            <MaterialCommunityIcons
-              name={getIconName(upgrade.icon)}
-              size={32}
-              color="#FFFFFF"
-            />
-          </View>
-        </View>
+      <View style={styles.iconContainer}>
+        <MaterialCommunityIcons name={getIconName(icon) as any} size={26} color="#4CAF50" />
+      </View>
+      
+      <View style={styles.infoContainer}>
+        <Text style={styles.name}>{name}</Text>
+        <Text style={styles.description}>{description}</Text>
         
-        <View style={styles.contentContainer}>
-          <View style={styles.titleRow}>
-            <Text style={styles.title}>
-              {upgrade.name}
-            </Text>
-            {getLevelBadge()}
+        <View style={styles.bottomRow}>
+          <View style={styles.levelContainer}>
+            <Text style={styles.levelLabel}>Level</Text>
+            <Text style={styles.levelValue}>{level}</Text>
+            <Text style={styles.priceText}>{formatMoney(price)}</Text>
           </View>
-          <Text style={styles.description}>{upgrade.description}</Text>
           
-          {upgrade.level > 0 ? (
-            <View style={styles.statsContainer}>
-              <View style={styles.multiplierBadge}>
-                <Text style={styles.bonusText}>
-                  +{upgrade.moneyPerClickBonus} per klik
-                </Text>
-              </View>
-            </View>
-          ) : (
-            <View style={styles.priceContainer}>
-              <MaterialCommunityIcons name={cashIcon} size={16} color="#FFFFFF" />
-              <Text style={styles.price}>{formatMoney(currentPrice)}</Text>
-            </View>
-          )}
-        </View>
-        
-        {upgrade.level > 0 ? (
-          <View style={styles.levelUpBadge}>
-            <Text style={styles.levelUpText}>Lv.{upgrade.level}</Text>
+          <View style={styles.effectContainer}>
+            <Text style={styles.effectValue}>+{effect}%</Text>
+            <Text style={styles.effectLabel}>Efek</Text>
           </View>
-        ) : (
-          disabled ? (
-            <View style={styles.lockBadge}>
-              <MaterialCommunityIcons name="lock" size={20} color="#90A4AE" />
-            </View>
-          ) : (
-            <View style={styles.buyBadge}>
-              <MaterialCommunityIcons name="plus-circle" size={24} color="#FFFFFF" />
-            </View>
-          )
-        )}
-      </LinearGradient>
+        </View>
+      </View>
+      
+      <View style={styles.priceContainer}>
+        <MaterialCommunityIcons 
+          name={disabled ? "lock" : "chevron-right"} 
+          size={24} 
+          color={disabled ? "#B0BEC5" : "#4CAF50"} 
+        />
+      </View>
     </TouchableOpacity>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    marginVertical: 8,
-    marginHorizontal: 4,
-    borderRadius: 16,
-    elevation: 4,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 3,
-    height: 110,
-  },
-  gradientContainer: {
     flexDirection: 'row',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
     padding: 12,
-    borderRadius: 16,
-    height: '100%',
+    marginBottom: 12,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    borderLeftWidth: 4,
+    borderLeftColor: '#4CAF50',
   },
-  disabled: {
-    opacity: 0.8,
-  },
-  owned: {
-    borderWidth: 0,
+  disabledContainer: {
+    opacity: 0.7,
+    borderLeftColor: '#B0BEC5',
   },
   iconContainer: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: 'rgba(76, 175, 80, 0.1)',
+    justifyContent: 'center',
+    alignItems: 'center',
     marginRight: 12,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
-  iconBackground: {
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.4)',
-  },
-  contentContainer: {
+  infoContainer: {
     flex: 1,
     justifyContent: 'center',
   },
-  titleRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 4,
-  },
-  title: {
+  name: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#FFFFFF',
-    textShadowColor: 'rgba(0, 0, 0, 0.2)',
-    textShadowOffset: { width: 1, height: 1 },
-    textShadowRadius: 1,
+    color: '#212121',
+    marginBottom: 2,
+  },
+  description: {
+    fontSize: 13,
+    color: '#757575',
+    marginBottom: 8,
+  },
+  bottomRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  levelContainer: {
+    flexDirection: 'column',
+    alignItems: 'flex-start',
+  },
+  levelLabel: {
+    fontSize: 12,
+    color: '#9E9E9E',
+  },
+  levelValue: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#4CAF50',
+  },
+  priceText: {
+    fontSize: 13,
+    color: '#FF9800',
+    fontWeight: 'bold',
+    marginTop: 2,
+  },
+  effectContainer: {
+    alignItems: 'flex-end',
+  },
+  effectValue: {
+    fontSize: 15,
+    fontWeight: 'bold',
+    color: '#2196F3',
+  },
+  effectLabel: {
+    fontSize: 12,
+    color: '#9E9E9E',
+  },
+  priceContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginLeft: 8,
+    width: 30,
   },
   levelBadge: {
     backgroundColor: 'rgba(255, 255, 255, 0.3)',
@@ -218,70 +219,6 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontWeight: 'bold',
     fontSize: 12,
-  },
-  description: {
-    fontSize: 12,
-    color: 'rgba(255, 255, 255, 0.9)',
-    marginBottom: 8,
-  },
-  priceContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.15)',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 12,
-    alignSelf: 'flex-start',
-  },
-  price: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    color: '#FFFFFF',
-    marginLeft: 4,
-  },
-  statsContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  multiplierBadge: {
-    backgroundColor: 'rgba(0, 0, 0, 0.15)',
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 12,
-  },
-  bonusText: {
-    fontSize: 12,
-    fontWeight: 'bold',
-    color: '#FFFFFF',
-  },
-  levelUpBadge: {
-    backgroundColor: 'rgba(255, 255, 255, 0.3)',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
-    justifyContent: 'center',
-    alignItems: 'center',
-    alignSelf: 'center',
-  },
-  levelUpText: {
-    color: '#FFFFFF',
-    fontWeight: 'bold',
-    fontSize: 12,
-  },
-  buyBadge: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    alignSelf: 'center',
-  },
-  lockBadge: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    alignSelf: 'center',
-  },
-  ownedBadge: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    alignSelf: 'center',
   },
 });
 
