@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="512" height="512" rx="100" fill="#1F2937"/>
+  <rect x="20" y="20" width="472" height="472" rx="80" fill="#4CAF50" fill-opacity="0.8"/>
+  
+  <!-- Building Base -->
+  <rect x="120" y="230" width="272" height="200" rx="20" fill="#E8F5E9"/>
+  
+  <!-- Building Top -->
+  <path d="M140 230L256 150L372 230" stroke="#FFC107" stroke-width="20" stroke-linecap="round" stroke-linejoin="round"/>
+  
+  <!-- Windows -->
+  <rect x="156" y="260" width="40" height="40" rx="5" fill="#1F2937"/>
+  <rect x="236" y="260" width="40" height="40" rx="5" fill="#1F2937"/>
+  <rect x="316" y="260" width="40" height="40" rx="5" fill="#1F2937"/>
+  <rect x="156" y="330" width="40" height="40" rx="5" fill="#1F2937"/>
+  <rect x="236" y="330" width="40" height="40" rx="5" fill="#1F2937"/>
+  <rect x="316" y="330" width="40" height="40" rx="5" fill="#1F2937"/>
+  
+  <!-- Door -->
+  <rect x="226" y="390" width="60" height="40" rx="5" fill="#795548"/>
+  
+  <!-- Money Symbol -->
+  <circle cx="256" cy="180" r="55" fill="#FFC107"/>
+  <path d="M256 146V214" stroke="#1F2937" stroke-width="14" stroke-linecap="round"/>
+  <path d="M236 156H266C276 156 286 163 286 178C286 193 276 200 266 200H236" stroke="#1F2937" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+  
+  <!-- Crown -->
+  <path d="M206 120L256 95L306 120L286 145H226L206 120Z" fill="#FFC107" stroke="#1F2937" stroke-width="6"/>
+</svg> 

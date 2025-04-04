@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, StatusBar, Linking, TouchableOpacity, Image, Modal, Alert } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, StatusBar, Linking, TouchableOpacity, Modal, Alert } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useGameContext } from '../contexts/GameContext';
 import { showInfoNotification } from '../utils/notifications';
+import BusinessLogo from '../components/BusinessLogo';
 
 export default function AboutScreen() {
   const { resetGame, saveGame } = useGameContext();
@@ -32,11 +33,7 @@ export default function AboutScreen() {
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.content}>
         <View style={styles.section}>
           <View style={styles.logoContainer}>
-            <Image 
-              source={require('../assets/icon.png')} 
-              style={styles.logo} 
-              resizeMode="contain"
-            />
+            <BusinessLogo width={120} height={120} />
           </View>
           <Text style={styles.gameName}>Empire Business Game</Text>
           <Text style={styles.version}>Versi 1.0.0</Text>
@@ -67,6 +64,22 @@ export default function AboutScreen() {
           <View style={styles.featureItem}>
             <MaterialCommunityIcons name="chart-line" size={24} color="#4CAF50" style={styles.featureIcon} />
             <Text style={styles.featureText}>Lacak statistik dan perkembangan permainanmu</Text>
+          </View>
+        </View>
+
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Fitur</Text>
+          <View style={styles.featureItem}>
+            <MaterialCommunityIcons name="checkbox-marked-circle" size={24} color="#4CAF50" style={styles.featureIcon} />
+            <Text style={styles.featureText}>Auto-save: Progres permainan disimpan otomatis</Text>
+          </View>
+          <View style={styles.featureItem}>
+            <MaterialCommunityIcons name="checkbox-marked-circle" size={24} color="#4CAF50" style={styles.featureIcon} />
+            <Text style={styles.featureText}>Penghasilan offline: Bisnis tetap menghasilkan saat kamu tidak bermain</Text>
+          </View>
+          <View style={styles.featureItem}>
+            <MaterialCommunityIcons name="checkbox-marked-circle" size={24} color="#4CAF50" style={styles.featureIcon} />
+            <Text style={styles.featureText}>Statistik lengkap untuk melacak kemajuan permainan</Text>
           </View>
         </View>
 
