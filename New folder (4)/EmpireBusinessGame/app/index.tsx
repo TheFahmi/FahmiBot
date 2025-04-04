@@ -78,6 +78,10 @@ export default function HomeScreen() {
   const [showMoneyAnimation, setShowMoneyAnimation] = useState(false);
   const [moneyAnimValue] = useState(new Animated.Value(0));
   const [clickPosition, setClickPosition] = useState({ x: screenWidth / 2, y: 300 });
+  // State untuk menyimpan animasi klik yang aktif
+  const [clickAnimations, setClickAnimations] = useState<Array<{id: number, amount: number, x: number, y: number}>>([]);
+  // Counter untuk ID unik animasi
+  const animationIdCounter = useRef(0);
   const [activeTab, setActiveTab] = useState<TabType>('upgrades');
   const [showPassiveIncomeToast, setShowPassiveIncomeToast] = useState(false);
   const [passiveAnimValue] = useState(new Animated.Value(0));
@@ -204,12 +208,32 @@ export default function HomeScreen() {
       addMoney(moneyPerClick, 'click');
       
       // Dapatkan posisi klik untuk animasi
+      let posX = screenWidth / 2;
+      let posY = 300;
+      
       if (event && event.nativeEvent) {
+        posX = event.nativeEvent.locationX;
+        posY = event.nativeEvent.locationY;
         setClickPosition({
-          x: event.nativeEvent.locationX,
-          y: event.nativeEvent.locationY,
+          x: posX,
+          y: posY,
         });
       }
+      
+      // Tambahkan animasi +(angka) perklik
+      const newAnimation = {
+        id: animationIdCounter.current++,
+        amount: moneyPerClick,
+        x: posX - 40 + Math.random() * 80, // Acak posisi di sekitar klik
+        y: posY - 20 - Math.random() * 40,  // Acak posisi di atas klik
+      };
+      
+      setClickAnimations(prev => [...prev, newAnimation]);
+      
+      // Hapus animasi setelah 800ms
+      setTimeout(() => {
+        setClickAnimations(prev => prev.filter(anim => anim.id !== newAnimation.id));
+      }, 800);
     }
   };
   
@@ -377,6 +401,22 @@ export default function HomeScreen() {
                 <Text style={styles.moneyAnimationText}>+{formatMoney(moneyPerClick || 0)}</Text>
               </Animated.View>
             )}
+            
+            {/* Tampilkan semua animasi klik yang aktif */}
+            {clickAnimations.map((anim) => (
+              <Animated.View 
+                key={anim.id}
+                style={[
+                  styles.clickAnimationContainer,
+                  {
+                    left: anim.x,
+                    top: anim.y,
+                  }
+                ]}
+              >
+                <Text style={styles.clickAnimationText}>+{formatMoney(anim.amount)}</Text>
+              </Animated.View>
+            ))}
           </TouchableOpacity>
         </View>
         
@@ -648,5 +688,28 @@ const styles = StyleSheet.create({
     padding: 8,
     borderRadius: 20,
     elevation: 2,
+  },
+  // Styling untuk animasi klik yang stack
+  clickAnimationContainer: {
+    position: 'absolute',
+    backgroundColor: 'rgba(76, 175, 80, 0.9)',
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 10,
+    zIndex: 100,
+    transform: [{translateY: -20}],
+    opacity: 0.9,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+  },
+  clickAnimationText: {
+    color: '#FFFFFF',
+    fontWeight: 'bold',
+    fontSize: 12,
   },
 }); 
