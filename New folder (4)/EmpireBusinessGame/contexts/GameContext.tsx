@@ -65,7 +65,8 @@ type Action =
   | { type: 'ADD_PASSIVE_INCOME' }
   | { type: 'COLLECT_OFFLINE_EARNINGS' }
   | { type: 'UPDATE_PLAYTIME'; payload: number }
-  | { type: 'LOAD_GAME'; payload: GameState };
+  | { type: 'LOAD_GAME'; payload: GameState }
+  | { type: 'UPGRADE_BUSINESS'; payload: string };
 
 // Konstanta
 const STORAGE_KEY = 'empire_business_game_data';
@@ -77,10 +78,10 @@ const initialUpgrades: UpgradeInterface[] = [
   {
     id: 'upgrade1',
     name: 'Klik Lebih Baik',
-    description: 'Meningkatkan uang per klik sebesar 0.5',
+    description: 'Meningkatkan uang per klik sebesar 1',
     basePrice: 20,
     level: 0,
-    moneyPerClickBonus: 0.5,
+    moneyPerClickBonus: 1,
     icon: 'cursor-default-click',
   },
   {
@@ -193,7 +194,7 @@ const initialStats: GameStats = {
 
 const initialState: GameState = {
   money: 0,
-  moneyPerClick: 0.5,
+  moneyPerClick: 1,
   moneyPerSecond: 0,
   totalMoney: 0,
   totalMoneySpent: 0,
@@ -248,21 +249,22 @@ const gameReducer = (state: GameState, action: Action): GameState => {
   switch (action.type) {
     case 'ADD_MONEY': {
       const source = action.source || 'click';
-      const newMoney = state.money + action.payload;
-      const newTotalMoney = state.totalMoney + action.payload;
+      const payloadAmount = Math.floor(action.payload);
+      const newMoney = state.money + payloadAmount;
+      const newTotalMoney = state.totalMoney + payloadAmount;
       
       // Update statistik berdasarkan sumber pendapatan
       const newStats = { ...state.stats };
       if (source === 'click') {
-        newStats.totalMoneyFromClicks += action.payload;
+        newStats.totalMoneyFromClicks += payloadAmount;
       } else if (source === 'business') {
-        newStats.totalMoneyFromBusinesses += action.payload;
+        newStats.totalMoneyFromBusinesses += payloadAmount;
       }
       
       return {
         ...state,
-        money: newMoney,
-        totalMoney: newTotalMoney,
+        money: Math.floor(newMoney),
+        totalMoney: Math.floor(newTotalMoney),
         stats: {
           ...newStats,
           highestMoneyPerClick: Math.max(newStats.highestMoneyPerClick, state.moneyPerClick),
@@ -296,8 +298,7 @@ const gameReducer = (state: GameState, action: Action): GameState => {
         level: upgrade.level + 1,
       };
       
-      const newMoneyPerClick =
-        state.moneyPerClick + upgrade.moneyPerClickBonus;
+      const newMoneyPerClick = Math.floor(state.moneyPerClick + upgrade.moneyPerClickBonus);
 
       // Tampilkan notifikasi sukses
       showSuccessNotification(
@@ -308,9 +309,9 @@ const gameReducer = (state: GameState, action: Action): GameState => {
       
       return {
         ...state,
-        money: state.money - price,
+        money: Math.floor(state.money - price),
         moneyPerClick: newMoneyPerClick,
-        totalMoneySpent: state.totalMoneySpent + price,
+        totalMoneySpent: Math.floor(state.totalMoneySpent + price),
         upgrades: newUpgrades,
         stats: {
           ...state.stats,
@@ -325,68 +326,106 @@ const gameReducer = (state: GameState, action: Action): GameState => {
         (business) => business.id === action.payload
       );
       
-      if (businessIndex === -1) return state;
+      if (businessIndex === -1) {
+        return state;
+      }
       
       const business = state.businesses[businessIndex];
-      const price = business.owned
-        ? calculateBusinessPrice(business.basePrice, business.level)
-        : business.basePrice;
       
-      if (state.money < price) {
+      if (business.owned) {
+        return state;
+      }
+      
+      if (state.money < business.basePrice) {
+        // Tampilkan peringatan
         showWarningNotification(
-          'Uang tidak cukup untuk membeli bisnis!', 
-          'cash-remove', 
+          'Uang tidak cukup untuk membeli bisnis ini!',
+          'cash-remove',
           2000
         );
         return state;
       }
       
       const newBusinesses = [...state.businesses];
-      const newLevel = business.owned ? business.level + 1 : 1;
       newBusinesses[businessIndex] = {
         ...business,
-        level: newLevel,
         owned: true,
         lastCollected: Date.now(),
       };
       
-      const newMoneyPerSecond = state.businesses.reduce((total, currentBusiness) => {
-        if (currentBusiness.id === business.id) {
-          return (
-            total +
-            (currentBusiness.owned
-              ? calculateBusinessIncome(currentBusiness.baseIncomePerSecond, currentBusiness.level)
-              : 0) +
-            calculateBusinessIncome(business.baseIncomePerSecond, newLevel)
-          );
-        }
-        return (
-          total +
-          (currentBusiness.owned
-            ? calculateBusinessIncome(currentBusiness.baseIncomePerSecond, currentBusiness.level)
-            : 0)
-        );
-      }, 0);
-
       // Tampilkan notifikasi sukses
-      const isNewBusiness = !business.owned;
       showSuccessNotification(
-        isNewBusiness 
-          ? `Bisnis baru: ${business.name} dibeli!` 
-          : `${business.name} ditingkatkan ke level ${newLevel}!`,
-        isNewBusiness ? 'store' : 'trending-up',
+        `Bisnis ${business.name} berhasil dibeli!`,
+        'store',
         2000
       );
       
       return {
         ...state,
-        money: state.money - price,
-        moneyPerSecond: newMoneyPerSecond,
-        totalMoneySpent: state.totalMoneySpent + price,
+        money: Math.floor(state.money - business.basePrice),
         businesses: newBusinesses,
         stats: {
           ...state.stats,
           totalBusinessesBought: state.stats.totalBusinessesBought + 1,
+        },
+        totalMoneySpent: Math.floor(state.totalMoneySpent + business.basePrice),
+      };
+    }
+    
+    case 'UPGRADE_BUSINESS': {
+      const businessIndex = state.businesses.findIndex(
+        (business) => business.id === action.payload
+      );
+      
+      if (businessIndex === -1 || !state.businesses[businessIndex].owned) {
+        return state;
+      }
+      
+      const business = state.businesses[businessIndex];
+      const upgradePrice = calculateBusinessPrice(business.basePrice, business.level);
+      
+      if (state.money < upgradePrice) {
+        // Tampilkan peringatan
+        showWarningNotification(
+          'Uang tidak cukup untuk meningkatkan bisnis ini!',
+          'cash-remove',
+          2000
+        );
+        return state;
+      }
+      
+      const newBusinesses = [...state.businesses];
+      newBusinesses[businessIndex] = {
+        ...business,
+        level: business.level + 1,
+      };
+      
+      // Hitung moneyPerSecond baru
+      const newMoneyPerSecond = Math.floor(newBusinesses.reduce((total, currentBusiness) => {
+        if (currentBusiness.owned) {
+          return total + calculateBusinessIncome(
+            currentBusiness.baseIncomePerSecond,
+            currentBusiness.level
+          );
+        }
+        return total;
+      }, 0));
+      
+      // Tampilkan notifikasi sukses
+      showSuccessNotification(
+        `Bisnis ${business.name} ditingkatkan ke level ${business.level + 1}!`,
+        'trending-up',
+        2000
+      );
+      
+      return {
+        ...state,
+        money: Math.floor(state.money - upgradePrice),
+        moneyPerSecond: newMoneyPerSecond,
+        businesses: newBusinesses,
+        totalMoneySpent: Math.floor(state.totalMoneySpent + upgradePrice),
+        stats: {
+          ...state.stats,
           highestMoneyPerSecond: Math.max(state.stats.highestMoneyPerSecond, newMoneyPerSecond),
         },
       };
@@ -404,10 +443,10 @@ const gameReducer = (state: GameState, action: Action): GameState => {
       const business = state.businesses[businessIndex];
       const currentTime = Date.now();
       const timeDiff = (currentTime - business.lastCollected) / 1000; // dalam detik
-      const income = calculateBusinessIncome(
+      const income = Math.floor(calculateBusinessIncome(
         business.baseIncomePerSecond,
         business.level
-      ) * timeDiff;
+      ) * timeDiff);
       
       if (income <= 0) {
         return state;
@@ -421,19 +460,19 @@ const gameReducer = (state: GameState, action: Action): GameState => {
       
       // Tampilkan notifikasi informasi
       showInfoNotification(
-        `Uang $${Math.floor(income)} dikumpulkan dari ${business.name}!`,
+        `Uang ${formatMoney(income)} dikumpulkan dari ${business.name}!`,
         'cash-plus',
         2000
       );
       
       return {
         ...state,
-        money: state.money + income,
-        totalMoney: state.totalMoney + income,
+        money: Math.floor(state.money + income),
+        totalMoney: Math.floor(state.totalMoney + income),
         businesses: newBusinesses,
         stats: {
           ...state.stats,
-          totalMoneyFromBusinesses: state.stats.totalMoneyFromBusinesses + income,
+          totalMoneyFromBusinesses: Math.floor(state.stats.totalMoneyFromBusinesses + income),
         },
       };
     }
@@ -446,10 +485,10 @@ const gameReducer = (state: GameState, action: Action): GameState => {
         
         const currentTime = Date.now();
         const timeDiff = (currentTime - business.lastCollected) / 1000; // dalam detik
-        const income = calculateBusinessIncome(
+        const income = Math.floor(calculateBusinessIncome(
           business.baseIncomePerSecond,
           business.level
-        ) * timeDiff;
+        ) * timeDiff);
         
         totalIncome += income;
         
@@ -465,12 +504,12 @@ const gameReducer = (state: GameState, action: Action): GameState => {
       
       return {
         ...state,
-        money: state.money + totalIncome,
-        totalMoney: state.totalMoney + totalIncome,
+        money: Math.floor(state.money + totalIncome),
+        totalMoney: Math.floor(state.totalMoney + totalIncome),
         businesses: newBusinesses,
         stats: {
           ...state.stats,
-          totalMoneyFromBusinesses: state.stats.totalMoneyFromBusinesses + totalIncome,
+          totalMoneyFromBusinesses: Math.floor(state.stats.totalMoneyFromBusinesses + totalIncome),
         },
       };
     }
