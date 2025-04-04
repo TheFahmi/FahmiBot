@@ -98,7 +98,7 @@ export default function HomeScreen() {
     clickTimes.push(now);
     
     // Hanya periksa jika sudah ada cukup sampel klik
-    if (clickTimes.length >= 10) {
+    if (clickTimes.length >= 20) {
       // Hapus entri lebih dari 20 detik yang lalu
       while (clickTimes.length > 0 && now - clickTimes[0] > 20000) {
         clickTimes.shift();
@@ -109,7 +109,7 @@ export default function HomeScreen() {
       const clicksPerSecond = recentClicks.length / 3;
       
       // Cek interval antar klik untuk mendeteksi pola yang konsisten (ciri autoclicker)
-      if (recentClicks.length >= 10) {
+      if (recentClicks.length >= 15) {
         const intervals = [];
         for (let i = 1; i < recentClicks.length; i++) {
           intervals.push(recentClicks[i] - recentClicks[i-1]);
@@ -120,9 +120,10 @@ export default function HomeScreen() {
         const variance = intervals.reduce((sum, val) => sum + Math.pow(val - avgInterval, 2), 0) / intervals.length;
         const stdDev = Math.sqrt(variance);
         
+        // Membuat deteksi lebih toleran
         // Auto clicker biasanya memiliki interval yang sangat konsisten (stdDev rendah)
         // dan klik per detik tinggi
-        if ((stdDev < 50 && clicksPerSecond > 5) || clicksPerSecond > 10) {
+        if ((stdDev < 20 && clicksPerSecond > 8) || clicksPerSecond > 15) {
           if (!isClickBlocked) {
             setIsClickBlocked(true);
             const blockDuration = 30000; // 30 detik
