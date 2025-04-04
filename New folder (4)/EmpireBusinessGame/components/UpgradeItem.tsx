@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import formatMoney from '../utils/formatMoney';
@@ -37,6 +37,9 @@ const UpgradeItem: React.FC<UpgradeItemProps> = ({
   disabled = false,
   owned = false,
 }) => {
+  // Tambahkan state untuk menampilkan tulisan klik
+  const [showClickText, setShowClickText] = useState(false);
+  
   // Icon default dari Material Community Icons
   const defaultIcon: IconName = "cursor-default-click";
   const cashIcon: IconName = "cash";
@@ -80,10 +83,23 @@ const UpgradeItem: React.FC<UpgradeItemProps> = ({
     return null;
   };
   
+  // Handle klik pada upgrade item
+  const handlePress = () => {
+    setShowClickText(true);
+    
+    // Tampilkan teks klik selama 500ms
+    setTimeout(() => {
+      setShowClickText(false);
+    }, 500);
+    
+    // Panggil fungsi onPress dari props
+    onPress();
+  };
+  
   return (
     <TouchableOpacity
       style={styles.container}
-      onPress={onPress}
+      onPress={handlePress}
       disabled={disabled}
       activeOpacity={0.8}
     >
@@ -104,6 +120,11 @@ const UpgradeItem: React.FC<UpgradeItemProps> = ({
               size={32}
               color="#FFFFFF"
             />
+            {showClickText && upgrade.level > 0 && (
+              <View style={styles.clickTextContainer}>
+                <Text style={styles.clickText}>+{upgrade.moneyPerClickBonus}</Text>
+              </View>
+            )}
           </View>
         </View>
         
@@ -232,14 +253,27 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: 12,
-    justifyContent: 'center',
-    alignItems: 'center',
+    alignSelf: 'center',
   },
   priceText: {
     color: '#FFFFFF',
     fontWeight: 'bold',
     fontSize: 14,
-  }
+  },
+  clickTextContainer: {
+    position: 'absolute',
+    backgroundColor: 'rgba(255, 152, 0, 0.9)',
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 10,
+    top: -15,
+    right: -15,
+  },
+  clickText: {
+    color: '#FFFFFF',
+    fontWeight: 'bold',
+    fontSize: 12,
+  },
 });
 
 export default UpgradeItem; 
