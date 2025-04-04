@@ -1,155 +1,125 @@
-import { Business } from '../contexts/GameContext';
+import { BusinessInterface } from '../contexts/GameContext';
 
-// Data bisnis awal
-const initialBusinesses: Record<string, Business> = {
+// Data bisnis awal dengan harga yang lebih tinggi dan pendapatan yang lebih rendah
+const initialBusinesses: Record<string, BusinessInterface> = {
   lemonade: {
     id: 'lemonade',
     name: 'Kedai Limun',
     description: 'Kedai limun sederhana yang menyegarkan di hari panas',
-    baseIncome: 1,
-    basePrice: 4,
-    icon: 'cup',
-    imagePath: require('../assets/images/businesses/lemonade.jpg'),
-    unlocked: false,
+    basePrice: 10, // Dinaikkan dari 4
     level: 0,
-    managerUnlocked: false,
-    managerPrice: 100,
-    cooldown: 3, // 3 detik
+    baseIncomePerSecond: 0.5, // Diturunkan dari 1
+    icon: 'cup',
+    owned: false,
+    lastCollected: Date.now()
   },
   
   newspaper: {
     id: 'newspaper',
     name: 'Kios Koran',
     description: 'Kios koran yang menyediakan berita harian terbaru',
-    baseIncome: 6,
-    basePrice: 60,
-    icon: 'newspaper',
-    imagePath: require('../assets/images/businesses/newspaper.jpg'),
-    unlocked: false,
+    basePrice: 150, // Dinaikkan dari 60
     level: 0,
-    managerUnlocked: false,
-    managerPrice: 500,
-    cooldown: 6, // 6 detik
+    baseIncomePerSecond: 3, // Diturunkan dari 6
+    icon: 'newspaper',
+    owned: false,
+    lastCollected: Date.now()
   },
   
   carwash: {
     id: 'carwash',
     name: 'Cuci Mobil',
     description: 'Tempat cuci mobil otomatis dengan layanan cepat',
-    baseIncome: 40,
-    basePrice: 720,
-    icon: 'car-wash',
-    imagePath: require('../assets/images/businesses/carwash.jpg'),
-    unlocked: false,
+    basePrice: 1500, // Dinaikkan dari 720
     level: 0,
-    managerUnlocked: false,
-    managerPrice: 4000,
-    cooldown: 10, // 10 detik
+    baseIncomePerSecond: 20, // Diturunkan dari 40
+    icon: 'car-wash',
+    owned: false,
+    lastCollected: Date.now()
   },
   
   pizzeria: {
     id: 'pizzeria',
     name: 'Pizzeria',
     description: 'Restoran pizza Italia dengan resep rahasia keluarga',
-    baseIncome: 220,
-    basePrice: 8640,
-    icon: 'pizza',
-    imagePath: require('../assets/images/businesses/pizzeria.jpg'),
-    unlocked: false,
+    basePrice: 15000, // Dinaikkan dari 8640
     level: 0,
-    managerUnlocked: false,
-    managerPrice: 25000,
-    cooldown: 15, // 15 detik
+    baseIncomePerSecond: 100, // Diturunkan dari 220
+    icon: 'pizza',
+    owned: false,
+    lastCollected: Date.now()
   },
   
   donutshop: {
     id: 'donutshop',
     name: 'Toko Donat',
     description: 'Toko donat dengan berbagai pilihan topping dan rasa',
-    baseIncome: 1200,
-    basePrice: 103680,
-    icon: 'food-donut',
-    imagePath: require('../assets/images/businesses/donutshop.jpg'),
-    unlocked: false,
+    basePrice: 200000, // Dinaikkan dari 103680
     level: 0,
-    managerUnlocked: false,
-    managerPrice: 150000,
-    cooldown: 20, // 20 detik
+    baseIncomePerSecond: 600, // Diturunkan dari 1200
+    icon: 'food-donut',
+    owned: false,
+    lastCollected: Date.now()
   },
   
   salon: {
     id: 'salon',
     name: 'Salon Kecantikan',
     description: 'Salon kecantikan dan spa dengan berbagai perawatan premium',
-    baseIncome: 6500,
-    basePrice: 1244160,
-    icon: 'content-cut',
-    imagePath: require('../assets/images/businesses/salon.jpg'),
-    unlocked: false,
+    basePrice: 2500000, // Dinaikkan dari 1244160
     level: 0,
-    managerUnlocked: false,
-    managerPrice: 900000,
-    cooldown: 30, // 30 detik
+    baseIncomePerSecond: 3000, // Diturunkan dari 6500
+    icon: 'content-cut',
+    owned: false,
+    lastCollected: Date.now()
   },
   
   minimarket: {
     id: 'minimarket',
     name: 'Mini Market',
     description: 'Mini market 24 jam dengan berbagai kebutuhan sehari-hari',
-    baseIncome: 35000,
-    basePrice: 14929920,
-    icon: 'store',
-    imagePath: require('../assets/images/businesses/minimarket.jpg'),
-    unlocked: false,
+    basePrice: 30000000, // Dinaikkan dari 14929920
     level: 0,
-    managerUnlocked: false,
-    managerPrice: 5000000,
-    cooldown: 45, // 45 detik
+    baseIncomePerSecond: 15000, // Diturunkan dari 35000
+    icon: 'store',
+    owned: false,
+    lastCollected: Date.now()
   },
   
   movietheater: {
     id: 'movietheater',
     name: 'Bioskop',
     description: 'Bioskop modern dengan teknologi suara dan gambar terbaru',
-    baseIncome: 175000,
-    basePrice: 179159040,
-    icon: 'movie',
-    imagePath: require('../assets/images/businesses/movietheater.jpg'),
-    unlocked: false,
+    basePrice: 350000000, // Dinaikkan dari 179159040
     level: 0,
-    managerUnlocked: false,
-    managerPrice: 25000000,
-    cooldown: 60, // 60 detik
+    baseIncomePerSecond: 80000, // Diturunkan dari 175000
+    icon: 'movie',
+    owned: false,
+    lastCollected: Date.now()
   },
   
   bank: {
     id: 'bank',
     name: 'Bank',
     description: 'Bank dengan berbagai layanan keuangan dan investasi',
-    baseIncome: 900000,
-    basePrice: 2149908480,
-    icon: 'bank',
-    imagePath: require('../assets/images/businesses/bank.jpg'),
-    unlocked: false,
+    basePrice: 4000000000, // Dinaikkan dari 2149908480
     level: 0,
-    managerUnlocked: false,
-    managerPrice: 125000000,
-    cooldown: 90, // 90 detik
+    baseIncomePerSecond: 400000, // Diturunkan dari 900000
+    icon: 'bank',
+    owned: false,
+    lastCollected: Date.now()
   },
   
   oilcompany: {
     id: 'oilcompany',
     name: 'Perusahaan Minyak',
     description: 'Perusahaan minyak multinasional dengan sumur minyak di berbagai negara',
-    baseIncome: 5000000,
-    basePrice: 25798901760,
-    icon: 'oil',
-    imagePath: require('../assets/images/businesses/oilcompany.jpg'),
-    unlocked: false,
+    basePrice: 50000000000, // Dinaikkan dari 25798901760
     level: 0,
-    managerUnlocked: false,
-    managerPrice: 750000000,
-    cooldown: 120, // 120 detik
+    baseIncomePerSecond: 2000000, // Diturunkan dari 5000000
+    icon: 'oil',
+    owned: false,
+    lastCollected: Date.now()
   },
 };
 

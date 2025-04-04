@@ -5,6 +5,7 @@ import {
   showInfoNotification,
   showWarningNotification
 } from '../utils/notifications';
+import formatMoney from '../utils/formatMoney';
 
 // Interfaces dan Types
 export interface UpgradeInterface {
@@ -76,46 +77,46 @@ const initialUpgrades: UpgradeInterface[] = [
   {
     id: 'upgrade1',
     name: 'Klik Lebih Baik',
-    description: 'Meningkatkan uang per klik sebesar 1',
-    basePrice: 10,
+    description: 'Meningkatkan uang per klik sebesar 0.5',
+    basePrice: 20,
     level: 0,
-    moneyPerClickBonus: 1,
+    moneyPerClickBonus: 0.5,
     icon: 'cursor-default-click',
   },
   {
     id: 'upgrade2',
     name: 'Klik Super',
-    description: 'Meningkatkan uang per klik sebesar 5',
-    basePrice: 50,
+    description: 'Meningkatkan uang per klik sebesar 2',
+    basePrice: 100,
     level: 0,
-    moneyPerClickBonus: 5,
+    moneyPerClickBonus: 2,
     icon: 'cursor-default-click-outline',
   },
   {
     id: 'upgrade3',
     name: 'Klik Luar Biasa',
-    description: 'Meningkatkan uang per klik sebesar 10',
-    basePrice: 200,
+    description: 'Meningkatkan uang per klik sebesar 5',
+    basePrice: 500,
     level: 0,
-    moneyPerClickBonus: 10,
+    moneyPerClickBonus: 5,
     icon: 'hand-extended',
   },
   {
     id: 'upgrade4',
     name: 'Klik Raja',
-    description: 'Meningkatkan uang per klik sebesar 50',
-    basePrice: 1000,
+    description: 'Meningkatkan uang per klik sebesar 25',
+    basePrice: 2500,
     level: 0,
-    moneyPerClickBonus: 50,
+    moneyPerClickBonus: 25,
     icon: 'crown',
   },
   {
     id: 'upgrade5',
     name: 'Klik Jutawan',
-    description: 'Meningkatkan uang per klik sebesar 100',
-    basePrice: 5000,
+    description: 'Meningkatkan uang per klik sebesar 50',
+    basePrice: 10000,
     level: 0,
-    moneyPerClickBonus: 100,
+    moneyPerClickBonus: 50,
     icon: 'diamond',
   },
 ];
@@ -192,7 +193,7 @@ const initialStats: GameStats = {
 
 const initialState: GameState = {
   money: 0,
-  moneyPerClick: 1,
+  moneyPerClick: 0.5,
   moneyPerSecond: 0,
   totalMoney: 0,
   totalMoneySpent: 0,
@@ -205,18 +206,18 @@ const initialState: GameState = {
 
 // Reducer
 const calculateUpgradePrice = (basePrice: number, level: number): number => {
-  return Math.floor(basePrice * Math.pow(1.1, level));
+  return Math.floor(basePrice * Math.pow(1.25, level));
 };
 
 const calculateBusinessPrice = (basePrice: number, level: number): number => {
-  return Math.floor(basePrice * Math.pow(1.15, level));
+  return Math.floor(basePrice * Math.pow(1.35, level));
 };
 
 const calculateBusinessIncome = (
   baseIncomePerSecond: number,
   level: number
 ): number => {
-  return Math.floor(baseIncomePerSecond * Math.pow(1.2, level));
+  return Math.floor(baseIncomePerSecond * Math.pow(1.15, level));
 };
 
 const gameReducer = (state: GameState, action: Action): GameState => {
@@ -458,16 +459,16 @@ const gameReducer = (state: GameState, action: Action): GameState => {
         return { ...state, lastSaveTime: currentTime };
       }
       
-      // Batasi waktu offline maksimum (24 jam)
-      const cappedOfflineTime = Math.min(offlineTime, 24 * 60 * 60);
+      // Batasi waktu offline maksimum (8 jam - lebih sedikit dari 24 jam sebelumnya)
+      const cappedOfflineTime = Math.min(offlineTime, 8 * 60 * 60);
       
-      // Hitung pendapatan offline (80% dari pendapatan normal)
-      const offlineEarnings = state.moneyPerSecond * cappedOfflineTime * 0.8;
+      // Hitung pendapatan offline (40% dari pendapatan normal - dikurangi dari 80%)
+      const offlineEarnings = state.moneyPerSecond * cappedOfflineTime * 0.4;
       const roundedEarnings = Math.floor(offlineEarnings);
       
       if (roundedEarnings > 0) {
         showInfoNotification(
-          `Anda mendapatkan $${roundedEarnings} saat offline!`,
+          `Anda mendapatkan ${formatMoney(roundedEarnings)} saat offline!`,
           'clock-time-eight',
           5000
         );

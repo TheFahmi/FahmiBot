@@ -27,35 +27,68 @@ export interface BoosterWithCooldown extends Booster {
 // Daftar booster default
 export const BOOSTERS: Booster[] = [
   {
-    id: 'booster_1',
-    name: 'Kopi',
-    description: 'Tingkatkan produktivitas 2x selama 1 menit',
-    cost: 100,
-    duration: 60 * 1000, // 1 menit dalam milidetik
-    multiplier: 2,
-    cooldown: 2 * 60 * 1000, // 2 menit cooldown
+    id: 'booster_click_2x',
+    name: 'Klik 2x',
+    description: 'Gandakan pendapatan per klik selama 2 menit',
+    cost: 1000,
+    duration: 120 * 1000, // 2 menit dalam milidetik
+    multiplier: 1.5,
+    cooldown: 600 * 1000, // 10 menit cooldown
     imageUrl: 'https://via.placeholder.com/50',
     owned: true,
   },
   {
-    id: 'booster_2',
-    name: 'Rapat Tim',
-    description: 'Tingkatkan produktivitas 3x selama 2 menit',
-    cost: 500,
-    duration: 2 * 60 * 1000, // 2 menit
-    multiplier: 3,
-    cooldown: 5 * 60 * 1000, // 5 menit cooldown
+    id: 'booster_passive_2x',
+    name: 'Passive 2x',
+    description: 'Gandakan pendapatan pasif selama 3 menit',
+    cost: 5000,
+    duration: 180 * 1000, // 3 menit dalam milidetik
+    multiplier: 1.5,
+    cooldown: 900 * 1000, // 15 menit cooldown
     imageUrl: 'https://via.placeholder.com/50',
     owned: false,
   },
   {
-    id: 'booster_3',
-    name: 'Konsultan',
-    description: 'Tingkatkan produktivitas 5x selama 5 menit',
-    cost: 2000,
-    duration: 5 * 60 * 1000, // 5 menit
-    multiplier: 5,
-    cooldown: 15 * 60 * 1000, // 15 menit cooldown
+    id: 'booster_all_2x',
+    name: 'Semua 2x',
+    description: 'Gandakan semua pendapatan selama 1 menit',
+    cost: 10000,
+    duration: 60 * 1000, // 1 menit dalam milidetik
+    multiplier: 1.5,
+    cooldown: 1800 * 1000, // 30 menit cooldown
+    imageUrl: 'https://via.placeholder.com/50',
+    owned: false,
+  },
+  {
+    id: 'booster_click_5x',
+    name: 'Klik 5x',
+    description: 'Tingkatkan pendapatan per klik sebanyak 3x selama 1 menit',
+    cost: 50000,
+    duration: 60 * 1000, // 1 menit dalam milidetik
+    multiplier: 3,
+    cooldown: 3600 * 1000, // 60 menit cooldown
+    imageUrl: 'https://via.placeholder.com/50',
+    owned: false,
+  },
+  {
+    id: 'booster_passive_5x',
+    name: 'Passive 5x',
+    description: 'Tingkatkan pendapatan pasif sebanyak 3x selama 2 menit',
+    cost: 100000,
+    duration: 120 * 1000, // 2 menit dalam milidetik
+    multiplier: 3,
+    cooldown: 3600 * 1000, // 60 menit cooldown
+    imageUrl: 'https://via.placeholder.com/50',
+    owned: false,
+  },
+  {
+    id: 'booster_all_5x',
+    name: 'Semua 5x',
+    description: 'Tingkatkan semua pendapatan sebanyak 3x selama 30 detik',
+    cost: 250000,
+    duration: 30 * 1000, // 30 detik dalam milidetik
+    multiplier: 3,
+    cooldown: 7200 * 1000, // 120 menit cooldown
     imageUrl: 'https://via.placeholder.com/50',
     owned: false,
   },
