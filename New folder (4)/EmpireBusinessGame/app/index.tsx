@@ -32,7 +32,24 @@ export default function HomeScreen() {
     buyUpgrade,
     buyBusiness,
     collectBusinessIncome,
+    saveGame,
   } = useGameContext();
+  
+  // State untuk notifikasi penyimpanan
+  const [showSaveNotification, setShowSaveNotification] = useState(false);
+  const saveNotificationOpacity = useRef(new Animated.Value(0)).current;
+  
+  // Fungsi untuk menyimpan game dan menampilkan notifikasi
+  const handleSaveGame = async () => {
+    const success = await saveGame();
+    
+    // Tampilkan notifikasi bahwa game berhasil disimpan
+    if (success) {
+      showInfoNotification('Game berhasil disimpan!', 'content-save', 2000);
+    } else {
+      showInfoNotification('Gagal menyimpan game', 'alert', 2000);
+    }
+  };
   
   // Memberikan nilai default untuk state yang mungkin undefined
   const { 
@@ -180,6 +197,13 @@ export default function HomeScreen() {
       <View style={styles.header}>
         <Text style={styles.gameTitle}>Empire Business</Text>
         <MaterialCommunityIcons name="crown" size={24} color="#FFC107" />
+        <TouchableOpacity 
+          style={styles.saveButton}
+          onPress={handleSaveGame}
+          activeOpacity={0.7}
+        >
+          <MaterialCommunityIcons name="content-save" size={22} color="#4CAF50" />
+        </TouchableOpacity>
       </View>
       
       {/* Layout Container dengan ScrollView */}
@@ -516,5 +540,13 @@ const styles = StyleSheet.create({
   tabContent: {
     flex: 1,
     padding: 12,
+  },
+  saveButton: {
+    position: 'absolute',
+    right: 16,
+    backgroundColor: 'rgba(76, 175, 80, 0.1)',
+    padding: 8,
+    borderRadius: 20,
+    elevation: 2,
   },
 }); 

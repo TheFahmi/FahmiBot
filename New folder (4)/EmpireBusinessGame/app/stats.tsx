@@ -1,9 +1,10 @@
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView, StatusBar } from 'react-native';
+import React, { useState, useRef } from 'react';
+import { View, Text, StyleSheet, ScrollView, StatusBar, TouchableOpacity, Animated } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useGameContext } from '../contexts/GameContext';
 import formatMoney from '../utils/formatMoney';
+import { showInfoNotification } from '../utils/notifications';
 
 // Fungsi untuk format waktu
 const formatPlaytime = (seconds: number): string => {
@@ -34,7 +35,7 @@ const calculateBusinessIncome = (
 };
 
 export default function StatsScreen() {
-  const { state } = useGameContext();
+  const { state, saveGame } = useGameContext();
   const {
     money = 0,
     moneyPerClick = 0,
@@ -77,6 +78,18 @@ export default function StatsScreen() {
   const averageClickValue = totalClicks > 0 ? Math.round(safeStats.totalMoneyFromClicks / totalClicks) : 0;
   const passiveIncomePercentage = totalMoney > 0 ? ((moneyPerSecond * 3600) / totalMoney) * 100 : 0;
   
+  // Fungsi untuk menyimpan game dan menampilkan notifikasi
+  const handleSaveGame = async () => {
+    const success = await saveGame();
+    
+    // Tampilkan notifikasi bahwa game berhasil disimpan
+    if (success) {
+      showInfoNotification('Game berhasil disimpan!', 'content-save', 2000);
+    } else {
+      showInfoNotification('Gagal menyimpan game', 'alert', 2000);
+    }
+  };
+  
   // Render statistik singkat
   const renderStatItem = (
     icon: string, 
@@ -106,6 +119,13 @@ export default function StatsScreen() {
       
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Statistik Permainan</Text>
+        <TouchableOpacity 
+          style={styles.saveButton}
+          onPress={handleSaveGame}
+          activeOpacity={0.7}
+        >
+          <MaterialCommunityIcons name="content-save" size={22} color="#4CAF50" />
+        </TouchableOpacity>
       </View>
       
       <ScrollView style={styles.scrollView}>
@@ -226,11 +246,21 @@ const styles = StyleSheet.create({
     paddingBottom: 16,
     paddingHorizontal: 16,
     alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'center',
   },
   headerTitle: {
     fontSize: 24,
     fontWeight: 'bold',
     color: '#FFFFFF',
+  },
+  saveButton: {
+    position: 'absolute',
+    right: 16,
+    backgroundColor: 'rgba(76, 175, 80, 0.2)',
+    padding: 8,
+    borderRadius: 20,
+    elevation: 2,
   },
   scrollView: {
     flex: 1,

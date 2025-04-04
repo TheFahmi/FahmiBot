@@ -525,6 +525,7 @@ interface GameContextValue {
   buyUpgrade: (upgradeId: string) => void;
   buyBusiness: (businessId: string) => void;
   collectBusinessIncome: (businessId: string) => void;
+  saveGame: () => Promise<boolean>;
 }
 
 const GameContext = createContext<GameContextValue | undefined>(undefined);
@@ -532,6 +533,22 @@ const GameContext = createContext<GameContextValue | undefined>(undefined);
 // Provider
 export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [state, dispatch] = useReducer(gameReducer, initialState);
+  
+  // Fungsi untuk menyimpan game ke localStorage
+  const saveGameData = async () => {
+    try {
+      const gameToSave = {
+        ...state,
+        lastSaveTime: Date.now(),
+      };
+      await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(gameToSave));
+      console.log('Game berhasil disimpan!');
+      return true;
+    } catch (error) {
+      console.error('Error menyimpan game:', error);
+      return false;
+    }
+  };
   
   // Muat game dari penyimpanan lokal
   useEffect(() => {
@@ -548,6 +565,8 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
           
           // Kumpulkan pendapatan offline
           dispatch({ type: 'COLLECT_OFFLINE_EARNINGS' });
+          
+          console.log('Game berhasil dimuat dari localStorage!');
         }
       } catch (error) {
         console.error('Error loading game:', error);
@@ -560,18 +579,23 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Simpan game secara otomatis
   useEffect(() => {
     const saveInterval = setInterval(async () => {
-      try {
-        const gameToSave = {
-          ...state,
-          lastSaveTime: Date.now(),
-        };
-        await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(gameToSave));
-      } catch (error) {
-        console.error('Error saving game:', error);
-      }
+      await saveGameData();
     }, AUTO_SAVE_INTERVAL);
     
     return () => clearInterval(saveInterval);
+  }, [state]);
+  
+  // Simpan game saat halaman akan ditutup
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      saveGameData();
+    };
+    
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
   }, [state]);
   
   // Timer untuk pendapatan pasif
@@ -601,6 +625,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   
   const resetGame = () => {
     dispatch({ type: 'RESET_GAME' });
+    saveGameData(); // Simpan status reset ke localStorage
   };
   
   const buyUpgrade = (upgradeId: string) => {
@@ -624,6 +649,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         buyUpgrade,
         buyBusiness,
         collectBusinessIncome,
+        saveGame: saveGameData, // Tambahkan fungsi untuk menyimpan game secara manual
       }}
     >
       {children}
@@ -644,6 +670,7 @@ export const useGameContext = () => {
       buyUpgrade: () => {},
       buyBusiness: () => {},
       collectBusinessIncome: () => {},
+      saveGame: async () => true,
     };
   }
   return context;

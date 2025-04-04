@@ -4,6 +4,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { GameProvider } from '../contexts/GameContext';
 import { View } from 'react-native';
 import NotificationContainer from '../components/Notifications';
+import { StatusBar } from 'expo-status-bar';
 
 // Fungsi untuk mendapatkan nama ikon yang valid
 const getIconName = (iconName: string): any => {
@@ -13,6 +14,7 @@ const getIconName = (iconName: string): any => {
 export default function RootLayout() {
   return (
     <GameProvider>
+      <StatusBar style="light" />
       <View style={{ flex: 1 }}>
         <Tabs screenOptions={{
           tabBarActiveTintColor: '#FF9500',
@@ -46,6 +48,15 @@ export default function RootLayout() {
                 />
               ),
             }} 
+          />
+          <Tabs.Screen
+            name="about"
+            options={{
+              title: 'Tentang',
+              tabBarIcon: ({ color }) => (
+                <MaterialCommunityIcons name="information-outline" size={24} color={color} />
+              ),
+            }}
           />
         </Tabs>
         <NotificationContainer />
