@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import formatMoney from '../utils/formatMoney';
@@ -64,6 +64,9 @@ const BusinessItem: React.FC<BusinessItemProps> = ({
   disabled = false,
   owned = business.owned, // Gunakan property 'owned' dari business
 }) => {
+  // Tambahkan state untuk menampilkan tulisan klik
+  const [showIncomeText, setShowIncomeText] = useState(false);
+  
   // Icon default dari Material Community Icons
   const moneyIcon: IconName = "cash";
   const infoIcon: IconName = "information-outline";
@@ -84,6 +87,21 @@ const BusinessItem: React.FC<BusinessItemProps> = ({
     }
   };
   
+  // Handle klik pada bisnis item
+  const handlePress = () => {
+    if (owned) {
+      setShowIncomeText(true);
+      
+      // Tampilkan teks income selama 500ms
+      setTimeout(() => {
+        setShowIncomeText(false);
+      }, 500);
+    }
+    
+    // Panggil fungsi onPress dari props
+    onPress();
+  };
+  
   // Hitung income yang akan didapat jika dibeli atau ditingkatkan
   const getIncomeText = () => {
     if (owned) {
@@ -98,7 +116,7 @@ const BusinessItem: React.FC<BusinessItemProps> = ({
   return (
     <TouchableOpacity
       style={styles.container}
-      onPress={onPress}
+      onPress={handlePress}
       disabled={disabled}
       activeOpacity={0.8}
     >
@@ -119,6 +137,11 @@ const BusinessItem: React.FC<BusinessItemProps> = ({
               size={32}
               color="white"
             />
+            {showIncomeText && owned && (
+              <View style={styles.incomePopupContainer}>
+                <Text style={styles.incomePopupText}>+{formatMoney(calculateBusinessIncome(business.baseIncomePerSecond, business.level))}</Text>
+              </View>
+            )}
           </View>
         </View>
         
@@ -266,6 +289,20 @@ const styles = StyleSheet.create({
     color: 'rgba(255, 255, 255, 0.7)',
     fontSize: 12,
     fontWeight: 'bold',
+  },
+  incomePopupContainer: {
+    position: 'absolute',
+    backgroundColor: 'rgba(255, 152, 0, 0.9)',
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 10,
+    top: -15,
+    right: -15,
+  },
+  incomePopupText: {
+    color: '#FFFFFF',
+    fontWeight: 'bold',
+    fontSize: 12,
   },
 });
 
