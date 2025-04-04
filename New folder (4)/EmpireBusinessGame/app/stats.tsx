@@ -36,22 +36,45 @@ const calculateBusinessIncome = (
 export default function StatsScreen() {
   const { state } = useGameContext();
   const {
-    money,
-    moneyPerClick,
-    moneyPerSecond,
-    totalMoney,
-    totalMoneySpent,
-    totalClicks,
-    stats,
-    upgrades,
-    businesses
-  } = state;
+    money = 0,
+    moneyPerClick = 0,
+    moneyPerSecond = 0,
+    totalMoney = 0,
+    totalMoneySpent = 0,
+    totalClicks = 0,
+    stats = {
+      playTime: 0,
+      totalClicks: 0,
+      totalUpgradesBought: 0,
+      totalBusinessesBought: 0,
+      highestMoneyPerClick: 0,
+      highestMoneyPerSecond: 0,
+      totalMoneyFromClicks: 0,
+      totalMoneyFromBusinesses: 0,
+      startTime: Date.now()
+    },
+    upgrades = [],
+    businesses = []
+  } = state || {};
+  
+  // Memeriksa apakah stats ada, jika tidak berikan nilai default
+  const safeStats = stats || {
+    playTime: 0,
+    totalClicks: 0,
+    totalUpgradesBought: 0,
+    totalBusinessesBought: 0,
+    highestMoneyPerClick: 0,
+    highestMoneyPerSecond: 0,
+    totalMoneyFromClicks: 0,
+    totalMoneyFromBusinesses: 0,
+    startTime: Date.now()
+  };
   
   // Hitung persentase kemajuan menuju kartu Diamond
   const progressToDiamond = Math.min(100, (totalMoney / 1000000) * 100);
   
   // Statistik tambahan
-  const averageClickValue = totalClicks > 0 ? Math.round(stats.totalMoneyFromClicks / totalClicks) : 0;
+  const averageClickValue = totalClicks > 0 ? Math.round(safeStats.totalMoneyFromClicks / totalClicks) : 0;
   const passiveIncomePercentage = totalMoney > 0 ? ((moneyPerSecond * 3600) / totalMoney) * 100 : 0;
   
   // Render statistik singkat
@@ -95,7 +118,7 @@ export default function StatsScreen() {
             {renderStatItem('cash-minus', 'Total Dihabiskan', formatMoney(totalMoneySpent), '#F44336')}
             {renderStatItem('cursor-default-click', 'Per Klik', formatMoney(moneyPerClick), '#2196F3')}
             {renderStatItem('cash-clock', 'Per Detik', formatMoney(moneyPerSecond), '#9C27B0')}
-            {renderStatItem('timer-outline', 'Waktu Bermain', formatPlaytime(stats.playTime), '#607D8B')}
+            {renderStatItem('timer-outline', 'Waktu Bermain', formatPlaytime(safeStats.playTime), '#607D8B')}
           </View>
         </View>
         
@@ -130,11 +153,11 @@ export default function StatsScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Aktivitas</Text>
           <View style={styles.statsGrid}>
-            {renderStatItem('cursor-pointer', 'Total Klik', stats.totalClicks, '#FF5722')}
-            {renderStatItem('arrow-up-bold-circle', 'Upgrade Dibeli', stats.totalUpgradesBought, '#8BC34A')}
-            {renderStatItem('store', 'Bisnis Dibeli', stats.totalBusinessesBought, '#00BCD4')}
-            {renderStatItem('cash-multiple', 'Penghasilan Klik', formatMoney(stats.totalMoneyFromClicks), '#795548')}
-            {renderStatItem('cash-clock', 'Penghasilan Pasif', formatMoney(stats.totalMoneyFromBusinesses), '#9E9E9E')}
+            {renderStatItem('cursor-pointer', 'Total Klik', safeStats.totalClicks, '#FF5722')}
+            {renderStatItem('arrow-up-bold-circle', 'Upgrade Dibeli', safeStats.totalUpgradesBought, '#8BC34A')}
+            {renderStatItem('store', 'Bisnis Dibeli', safeStats.totalBusinessesBought, '#00BCD4')}
+            {renderStatItem('cash-multiple', 'Penghasilan Klik', formatMoney(safeStats.totalMoneyFromClicks), '#795548')}
+            {renderStatItem('cash-clock', 'Penghasilan Pasif', formatMoney(safeStats.totalMoneyFromBusinesses), '#9E9E9E')}
           </View>
         </View>
         

@@ -496,12 +496,14 @@ const gameReducer = (state: GameState, action: Action): GameState => {
     }
     
     case 'RESET_GAME': {
+      const newStats = {
+        ...initialStats,
+        startTime: Date.now(),
+      };
+      
       return {
         ...initialState,
-        stats: {
-          ...initialStats,
-          startTime: Date.now(),
-        },
+        stats: newStats,
         lastSaveTime: Date.now(),
       };
     }
@@ -538,6 +540,10 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const savedGame = await AsyncStorage.getItem(STORAGE_KEY);
         if (savedGame) {
           const parsedGame = JSON.parse(savedGame) as GameState;
+          
+          // Pastikan stats selalu ada
+          parsedGame.stats = parsedGame.stats || { ...initialStats };
+          
           dispatch({ type: 'LOAD_GAME', payload: parsedGame });
           
           // Kumpulkan pendapatan offline
@@ -629,7 +635,16 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
 export const useGameContext = () => {
   const context = useContext(GameContext);
   if (!context) {
-    throw new Error('useGameContext must be used within a GameProvider');
+    // Kembalikan default value alih-alih throw error
+    console.warn('useGameContext must be used within a GameProvider');
+    return {
+      state: initialState,
+      addMoney: () => {},
+      resetGame: () => {},
+      buyUpgrade: () => {},
+      buyBusiness: () => {},
+      collectBusinessIncome: () => {},
+    };
   }
   return context;
 }; 

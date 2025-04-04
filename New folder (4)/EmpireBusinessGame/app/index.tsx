@@ -27,20 +27,34 @@ const calculateBusinessPrice = (basePrice: number, level: number): number => {
 
 export default function HomeScreen() {
   const { 
-    state: {
-      money, 
-      moneyPerClick, 
-      moneyPerSecond,
-      totalMoney, 
-      totalClicks,
-      upgrades, 
-      businesses,
-    },
+    state,
     addMoney,
     buyUpgrade,
     buyBusiness,
     collectBusinessIncome,
   } = useGameContext();
+  
+  // Memberikan nilai default untuk state yang mungkin undefined
+  const { 
+    money = 0, 
+    moneyPerClick = 0, 
+    moneyPerSecond = 0,
+    totalMoney = 0, 
+    totalClicks = 0,
+    upgrades = [], 
+    businesses = [],
+    stats = {
+      playTime: 0,
+      totalClicks: 0,
+      totalUpgradesBought: 0,
+      totalBusinessesBought: 0,
+      highestMoneyPerClick: 0,
+      highestMoneyPerSecond: 0,
+      totalMoneyFromClicks: 0,
+      totalMoneyFromBusinesses: 0,
+      startTime: Date.now()
+    }
+  } = state || {};
   
   const [scale] = useState(new Animated.Value(1));
   const [showMoneyAnimation, setShowMoneyAnimation] = useState(false);
