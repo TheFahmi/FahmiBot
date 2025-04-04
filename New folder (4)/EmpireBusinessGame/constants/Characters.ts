@@ -62,4 +62,21 @@ export const CHARACTERS: Character[] = [
     name: 'CEO',
     description: 'Meningkatkan semua pendapatan sebesar 20%',
     cost: 100000,
+    clickMultiplier: 1.2,
+    autoClickerMultiplier: 1.2,
+    imageUrl: 'https://via.placeholder.com/100',
+    owned: false,
+    unlocked: false,
+  },
+  {
+    id: 'char_6',
+    name: 'Taipan Bisnis',
+    description: 'Meningkatkan semua pendapatan sebesar 30%',
+    cost: 500000,
+    clickMultiplier: 1.3,
+    autoClickerMultiplier: 1.3,
+    imageUrl: 'https://via.placeholder.com/100',
+    owned: false,
+    unlocked: false,
+  }
 ]; 
