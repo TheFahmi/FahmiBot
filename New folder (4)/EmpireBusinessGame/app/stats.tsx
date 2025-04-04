@@ -31,7 +31,15 @@ const calculateBusinessIncome = (
   baseIncomePerSecond: number,
   level: number
 ): number => {
-  return Math.floor(baseIncomePerSecond * Math.pow(1.2, level));
+  // Menggunakan kenaikan persentase tetap bukannya eksponen
+  const incrementFactor = 15; // 15% kenaikan per level
+  let finalIncome = baseIncomePerSecond;
+  
+  for (let i = 0; i < level; i++) {
+    finalIncome += Math.floor(finalIncome * incrementFactor / 100);
+  }
+  
+  return Math.floor(finalIncome);
 };
 
 export default function StatsScreen() {

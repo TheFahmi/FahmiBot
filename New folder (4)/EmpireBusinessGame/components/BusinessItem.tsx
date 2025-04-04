@@ -10,7 +10,15 @@ type IconName = React.ComponentProps<typeof MaterialCommunityIcons>['name'];
 
 // Fungsi untuk menghitung harga bisnis
 const calculateBusinessPrice = (basePrice: number, level: number): number => {
-  return Math.floor(basePrice * Math.pow(1.15, level));
+  // Menggunakan kenaikan persentase tetap bukannya eksponen
+  const incrementFactor = 35; // 35% kenaikan per level
+  let finalPrice = basePrice;
+  
+  for (let i = 0; i < level; i++) {
+    finalPrice += Math.floor(finalPrice * incrementFactor / 100);
+  }
+  
+  return Math.floor(finalPrice);
 };
 
 // Fungsi untuk menghitung pendapatan bisnis
@@ -18,7 +26,15 @@ const calculateBusinessIncome = (
   baseIncomePerSecond: number,
   level: number
 ): number => {
-  return Math.floor(baseIncomePerSecond * Math.pow(1.2, level));
+  // Menggunakan kenaikan persentase tetap bukannya eksponen
+  const incrementFactor = 15; // 15% kenaikan per level
+  let finalIncome = baseIncomePerSecond;
+  
+  for (let i = 0; i < level; i++) {
+    finalIncome += Math.floor(finalIncome * incrementFactor / 100);
+  }
+  
+  return Math.floor(finalIncome);
 };
 
 interface BusinessItemProps {

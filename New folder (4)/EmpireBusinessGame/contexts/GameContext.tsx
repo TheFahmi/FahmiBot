@@ -206,18 +206,42 @@ const initialState: GameState = {
 
 // Reducer
 const calculateUpgradePrice = (basePrice: number, level: number): number => {
-  return Math.floor(basePrice * Math.pow(1.25, level));
+  // Menggunakan kenaikan persentase tetap bukannya eksponen
+  const incrementFactor = 25; // 25% kenaikan per level
+  let finalPrice = basePrice;
+  
+  for (let i = 0; i < level; i++) {
+    finalPrice += Math.floor(finalPrice * incrementFactor / 100);
+  }
+  
+  return Math.floor(finalPrice);
 };
 
 const calculateBusinessPrice = (basePrice: number, level: number): number => {
-  return Math.floor(basePrice * Math.pow(1.35, level));
+  // Menggunakan kenaikan persentase tetap bukannya eksponen
+  const incrementFactor = 35; // 35% kenaikan per level
+  let finalPrice = basePrice;
+  
+  for (let i = 0; i < level; i++) {
+    finalPrice += Math.floor(finalPrice * incrementFactor / 100);
+  }
+  
+  return Math.floor(finalPrice);
 };
 
 const calculateBusinessIncome = (
   baseIncomePerSecond: number,
   level: number
 ): number => {
-  return Math.floor(baseIncomePerSecond * Math.pow(1.15, level));
+  // Menggunakan kenaikan persentase tetap bukannya eksponen
+  const incrementFactor = 15; // 15% kenaikan per level
+  let finalIncome = baseIncomePerSecond;
+  
+  for (let i = 0; i < level; i++) {
+    finalIncome += Math.floor(finalIncome * incrementFactor / 100);
+  }
+  
+  return Math.floor(finalIncome);
 };
 
 const gameReducer = (state: GameState, action: Action): GameState => {
