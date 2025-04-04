@@ -16,6 +16,7 @@ export interface UpgradeInterface {
   level: number;
   moneyPerClickBonus: number;
   icon: string;
+  effect: number;
 }
 
 export interface BusinessInterface {
@@ -83,6 +84,7 @@ const initialUpgrades: UpgradeInterface[] = [
     level: 0,
     moneyPerClickBonus: 1,
     icon: 'cursor-default-click',
+    effect: 0,
   },
   {
     id: 'upgrade2',
@@ -92,6 +94,7 @@ const initialUpgrades: UpgradeInterface[] = [
     level: 0,
     moneyPerClickBonus: 2,
     icon: 'cursor-default-click-outline',
+    effect: 0,
   },
   {
     id: 'upgrade3',
@@ -101,6 +104,7 @@ const initialUpgrades: UpgradeInterface[] = [
     level: 0,
     moneyPerClickBonus: 5,
     icon: 'hand-extended',
+    effect: 0,
   },
   {
     id: 'upgrade4',
@@ -110,6 +114,7 @@ const initialUpgrades: UpgradeInterface[] = [
     level: 0,
     moneyPerClickBonus: 25,
     icon: 'crown',
+    effect: 0,
   },
   {
     id: 'upgrade5',
@@ -119,6 +124,7 @@ const initialUpgrades: UpgradeInterface[] = [
     level: 0,
     moneyPerClickBonus: 50,
     icon: 'diamond',
+    effect: 0,
   },
 ];
 

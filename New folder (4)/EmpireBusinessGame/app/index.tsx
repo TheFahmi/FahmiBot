@@ -205,7 +205,15 @@ export default function HomeScreen() {
     if (!checkClickPattern()) {
       // Hanya lanjutkan jika tidak ada pola yang mencurigakan
       animateButton();
-      addMoney(moneyPerClick, 'click');
+      
+      // Hitung jumlah uang yang didapat dari klik
+      const baseMoneyPerClick = moneyPerClick || 1; // Dapatkan minimal 1 koin jika moneyPerClick masih 0
+      // Variasi acak untuk membuat klik lebih menyenangkan (± 5%)
+      const variationPercent = 0.95 + (Math.random() * 0.1);
+      const earnedMoney = Math.floor(baseMoneyPerClick * variationPercent);
+      
+      // Tambahkan uang ke saldo
+      addMoney(earnedMoney, 'click');
       
       // Dapatkan posisi klik untuk animasi
       let posX = screenWidth / 2;
@@ -223,7 +231,7 @@ export default function HomeScreen() {
       // Tambahkan animasi +(angka) perklik
       const newAnimation = {
         id: animationIdCounter.current++,
-        amount: moneyPerClick,
+        amount: earnedMoney,
         x: posX - 40 + Math.random() * 80, // Acak posisi di sekitar klik
         y: posY - 20 - Math.random() * 40,  // Acak posisi di atas klik
       };
@@ -234,6 +242,25 @@ export default function HomeScreen() {
       setTimeout(() => {
         setClickAnimations(prev => prev.filter(anim => anim.id !== newAnimation.id));
       }, 800);
+      
+      // Efek visual tambahan saat klik untuk memberikan feedback
+      Animated.sequence([
+        Animated.timing(buttonScale, {
+          toValue: 0.95,
+          duration: 50,
+          useNativeDriver: true,
+        }),
+        Animated.timing(buttonScale, {
+          toValue: 1.02,
+          duration: 100,
+          useNativeDriver: true,
+        }),
+        Animated.timing(buttonScale, {
+          toValue: 1,
+          duration: 50,
+          useNativeDriver: true,
+        }),
+      ]).start();
     }
   };
   
@@ -404,13 +431,24 @@ export default function HomeScreen() {
             
             {/* Tampilkan semua animasi klik yang aktif */}
             {clickAnimations.map((anim) => (
-              <Animated.View 
+              <Animated.View
                 key={anim.id}
                 style={[
                   styles.clickAnimationContainer,
                   {
+                    position: 'absolute',
                     left: anim.x,
                     top: anim.y,
+                    opacity: new Animated.Value(1),
+                    transform: [
+                      {
+                        translateY: new Animated.Value(0).interpolate({
+                          inputRange: [0, 1],
+                          outputRange: [0, -30],
+                        })
+                      },
+                      { scale: new Animated.Value(1) }
+                    ]
                   }
                 ]}
               >
@@ -692,24 +730,23 @@ const styles = StyleSheet.create({
   // Styling untuk animasi klik yang stack
   clickAnimationContainer: {
     position: 'absolute',
-    backgroundColor: 'rgba(76, 175, 80, 0.9)',
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
     paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 10,
-    zIndex: 100,
-    transform: [{translateY: -20}],
-    opacity: 0.9,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
+    paddingVertical: 4,
+    borderRadius: 12,
+    zIndex: 999,
+    elevation: 5,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 3,
   },
   clickAnimationText: {
-    color: '#FFFFFF',
+    color: '#4CAF50',
     fontWeight: 'bold',
-    fontSize: 12,
+    fontSize: 14,
+    textShadowColor: 'rgba(0, 0, 0, 0.2)',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 1,
   },
 }); 
